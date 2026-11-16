@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Medical Billing System</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #eef2f7;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px #0002;
+}
+
+header {
+    text-align: center;
+    color: #087e8b;
+    border-bottom: 2px solid #ddd;
+    margin-bottom: 25px;
+}
+
+h2 {
+    color: #087e8b;
+    font-size: 19px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+input, select {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-top: 6px;
+}
+
+label {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    background: #087e8b;
+    color: white;
+}
+
+td input {
+    width: 90px;
+}
+
+button {
+    padding: 11px 18px;
+    border: none;
+    background: #087e8b;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+button:hover {
+    background: #055d68;
+}
+
+.remove-btn {
+    background: #dc3545;
+}
+
+.total-section {
+    text-align: right;
+    margin-top: 25px;
+    line-height: 2;
+}
+
+.grand-total {
+    font-size: 23px;
+    color: #087e8b;
+    font-weight: bold;
+}
+
+.actions {
+    text-align: center;
+}
+
+@media(max-width:600px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .container {
+        padding: 15px;
+        overflow-x: auto;
+    }
+}
+
+@media print {
+    body {
+        background: white;
+        padding: 0;
+    }
+
+    .container {
+        box-shadow: none;
+    }
+
+    .actions, .remove-btn, #addBtn {
+        display: none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+    <h1>🏥 CITY CARE HOSPITAL</h1>
+    <p>Medical Billing Management System</p>
+    <p>Coimbatore, Tamil Nadu</p>
+</header>
+
+<h2>Patient Information</h2>
+
+<div class="form-grid">
+
+    <div>
+        <label>Patient Name</label>
+        <input type="text" id="patient" placeholder="Enter patient name">
+    </div>
+
+    <div>
+        <label>Patient ID</label>
+        <input type="text" id="patientId" placeholder="Enter patient ID">
+    </div>
+
+    <div>
+        <label>Doctor Name</label>
+        <input type="text" id="doctor" placeholder="Enter doctor name">
+    </div>
+
+    <div>
+        <label>Billing Date</label>
+        <input type="date" id="date">
+    </div>
+
+</div>
+
+<h2>Medical Services & Charges</h2>
+
+<table id="billTable">
+
+<thead>
+<tr>
+    <th>Service / Medicine</th>
+    <th>Quantity</th>
+    <th>Rate (₹)</th>
+    <th>Amount (₹)</th>
+    <th>Action</th>
+</tr>
+</thead>
+
+<tbody id="billBody">
+
+<tr>
+    <td><input type="text" value="Consultation"></td>
+    <td><input type="number" value="1" min="1" oninput="calculate()"></td>
+    <td><input type="number" value="500" min="0" oninput="calculate()"></td>
+    <td class="amount">500.00</td>
+    <td><button class="remove-btn" onclick="removeRow(this)">X</button></td>
+</tr>
+
+<tr>
+    <td><input type="text" value="Blood Test"></td>
+    <td><input type="number" value="1" min="1" oninput="calculate()"></td>
+    <td><input type="number" value="300" min="0" oninput="calculate()"></td>
+    <td class="amount">300.00</td>
+    <td><button class="remove-btn" onclick="removeRow(this)">X</button></td>
+</tr>
+
+<tr>
+    <td><input type="text" value="Medicines"></td>
+    <td><input type="number" value="2" min="1" oninput="calculate()"></td>
+    <td><input type="number" value="100" min="0" oninput="calculate()"></td>
+    <td class="amount">200.00</td>
+    <td><button class="remove-btn" onclick="removeRow(this)">X</button></td>
+</tr>
+
+</tbody>
+</table>
+
+<button id="addBtn" onclick="addRow()">+ Add Service</button>
+
+<div class="total-section">
+
+    <p>Subtotal: ₹ <span id="subtotal">1000.00</span></p>
+
+    <p>
+        GST (%):
+        <input type="number" id="gst" value="0" min="0"
+        max="100" style="width:80px" oninput="calculate()">
+    </p>
+
+    <p>GST Amount: ₹ <span id="gstAmount">0.00</span></p>
+
+    <p>
+        Discount (₹):
+        <input type="number" id="discount" value="0"
+        min="0" style="width:100px" oninput="calculate()">
+    </p>
+
+    <h2 class="grand-total">
+        Grand Total: ₹ <span id="grandTotal">1000.00</span>
+    </h2>
+
+</div>
+
+<div class="actions">
+    <button onclick="generateBill()">Generate Bill</button>
+    <button onclick="window.print()">Print Bill</button>
+    <button onclick="location.reload()">New Bill</button>
+</div>
+
+</div>
+
+<script>
+
+document.getElementById("date").value =
+new Date().toISOString().split("T")[0];
+
+function calculate() {
+
+    let rows = document.querySelectorAll("#billBody tr");
+    let subtotal = 0;
+
+    rows.forEach(row => {
+
+        let inputs = row.querySelectorAll("input");
+
+        let qty = Math.max(0, Number(inputs[1].value) || 0);
+        let rate = Math.max(0, Number(inputs[2].value) || 0);
+
+        let amount = qty * rate;
+
+        row.querySelector(".amount").innerText =
+        amount.toFixed(2);
+
+        subtotal += amount;
+
+    });
+
+    let gst = Math.min(100, Math.max(0,
+        Number(document.getElementById("gst").value) || 0));
+
+    let discount = Math.max(0,
+        Number(document.getElementById("discount").value) || 0);
+
+    let gstAmount = subtotal * gst / 100;
+
+    let grandTotal = Math.max(0,
+        subtotal + gstAmount - discount);
+
+    document.getElementById("subtotal").innerText =
+    subtotal.toFixed(2);
+
+    document.getElementById("gstAmount").innerText =
+    gstAmount.toFixed(2);
+
+    document.getElementById("grandTotal").innerText =
+    grandTotal.toFixed(2);
+}
+
+function addRow() {
+
+    let tbody = document.getElementById("billBody");
+
+    let row = document.createElement("tr");
+
+    row.innerHTML = `
+        <td><input type="text" placeholder="Service name"></td>
+        <td><input type="number" value="1" min="1" oninput="calculate()"></td>
+        <td><input type="number" value="0" min="0" oninput="calculate()"></td>
+        <td class="amount">0.00</td>
+        <td><button class="remove-btn" onclick="removeRow(this)">X</button></td>
+    `;
+
+    tbody.appendChild(row);
+
+    calculate();
+}
+
+function removeRow(button) {
+
+    button.closest("tr").remove();
+
+    calculate();
+}
+
+function generateBill() {
+
+    let patient = document.getElementById("patient").value;
+
+    if(patient.trim() === "") {
+        alert("Please enter patient name!");
+        return;
+    }
+
+    alert(
+        "Medical Bill Generated Successfully!\n" +
+        "Patient: " + patient + "\n" +
+        "Total Amount: ₹" +
+        document.getElementById("grandTotal").innerText
+    );
+
+}
+
+calculate();
+
+</script>
+
+</body>
+</html>
